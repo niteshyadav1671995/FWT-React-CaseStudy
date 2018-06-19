@@ -1,0 +1,226 @@
+<html>
+    <head>
+        <meta charset="utf8">
+        <link rel="stylesheet" href="css/bootstrap.min.css">
+        <link rel="stylesheet" href="css/style.css">
+        <script src = "./js/react.js"></script>
+        <script src = "./js/react-dom.js"></script>
+        <script src = "./js/babel.min.js"></script>
+        <script type="text/babel">
+
+            class Header extends React.Component{
+                render(){
+                       return (
+                           <div className="jumbotron">
+                            <h1>Shopping Application</h1>
+                           </div>
+                        );   
+                    }
+            }
+            
+            class Main extends React.Component{
+
+                constructor(){
+                    super();
+                    this.state =  {
+                        username : "Nitesh",
+                        password : "123",
+                        status : false,
+                        message : ""
+                    }
+                    
+                }
+                
+                changeStatus (){
+                    var newStatus = !this.state.status
+                    this.setState({
+                        status : newStatus
+                    })
+                }
+                
+                showMessage(message){
+                    this.setState({
+                        message : message
+                    })
+                }
+                
+                checkAuth(){
+                var name = document.getElementById("username").value;
+                var pass = document.getElementById("password").value;
+                if(name == this.state.username && pass == this.state.password){
+                    this.changeStatus.call(this);
+                }
+                else{ 
+                    this.showMessage("Invalid UserName or Password").bind(this);
+                }
+                }
+
+                render(){
+               
+                   if(this.state.status){
+                         return(
+                            <div>
+                                 Welcome {this.state.username}!
+                                 <button onClick = {this.changeStatus.bind(this)}>Logout</button>
+                                 <ProductComponent/>
+                            </div>
+                         );
+                    }else{ 
+                        return(    
+                            <div>
+                                {this.state.message}
+                                <LoginComponent authValue= {this.state} checkAuth ={this.checkAuth.bind(this)} changeStatus = {this.changeStatus.bind(this)}/>
+                            </div>
+                        );
+                    }
+                }
+            }
+
+            class LoginComponent extends React.Component{
+                constructor(){
+                    super();
+                  }
+                render(){
+                    return(
+                        <div className = "login">
+                            User Name <input className="form-control" type = "text" id = "username"/>
+                            Password  <input className="form-control" type = "password" id = "password"/>
+                            <button onClick= {this.props.checkAuth}> Login </button>
+                        </div> 
+                    );
+                }
+            }
+
+            class ProductComponent extends React.Component{
+                constructor(){
+                    super();
+                    this.state = {
+                        products : [	
+                            {id: 0, name: 'Computer', price: 30000, brand: 'Lenevo', quantity : 1},
+                            {id: 1, name: 'TV', price: 10000, brand: 'Sony', quantity : 1},
+                            {id: 2, name: 'Refrigrator', price: 30000, brand: 'Sony', quantity : 1},
+                            {id: 3, name: 'Washing Machine', price: 25000, brand: 'Sony', quantity : 1},
+                            {id: 4, name: 'Radio', price: 5000, brand: 'Sony', quantity : 1}
+                        ],
+                        productsInCart : [],
+                        totalPrice : 0
+                    }
+                    this.addProductToCarts = this.addProductToCarts.bind(this);
+                }
+
+                addProductToCarts (id) {
+                    var productsInCart = this.state.productsInCart;
+                    var present = productsInCart.some(function(value){
+                      return value.id === id;
+                    })
+                    if(present){
+                        productsInCart[id].quantity++;
+                        console.log(productsInCart[id].quantity);
+                    }
+                    else{
+                    productsInCart.push(this.state.products[id])
+                    console.log(this.state.productsInCart);
+                    }
+                    this.setState({
+                        productsInCart : productsInCart
+                    })
+                }
+                
+                buyProduct (id){
+                    var totalPrice = 0;
+                    this.state.productsInCart.map((item,index)=>{
+                        totalPrice = totalPrice + (item.price*item.quantity)
+                        console.log(totalPrice);
+                    })
+                    this.setState({
+                        totalPrice : totalPrice
+                    })
+                }
+                render(){
+                    return(
+                        <div className = "productMain">
+                           <div className = "product">
+                            {this.state.products.map((item,index) => (
+                                <RenderProduct 
+                                addProductToCarts = {this.addProductToCarts}
+                                key = {item.id}
+                                unique = {item.id}
+                                name = {item.name}
+                                price = {item.price}
+                                brand = {item.brand}
+                                item={item}
+                                />
+                            ))}
+                          </div>
+                           <div className = "productCart">
+                            <h1>Products In Cart</h1>
+                            {this.state.productsInCart.map((item,index) => (
+                                <ProductInCartComponent 
+                                key = {item.id}
+                                quantity = {item.quantity}
+                                item={item}
+                                buy= {this.buyProduct.bind(this)}
+                                 />
+                                ))}
+                             <button onClick = {this.buyProduct.bind(this)}>Buy</button>
+                            </div>
+                           
+                                <h2>Total Price {this.state.totalPrice}</h2>
+                        </div>
+                    );
+                }
+            }
+
+
+            class ProductInCartComponent extends React.Component{
+                render(){
+                    return(
+                        <div>
+                            <p>Product Name : {this.props.item.name} Price : {this.props.item.price} Brand : {this.props.item.brand}  Quatity : {this.props.item.quantity}</p>
+                        </div>
+                    );
+                }
+            }
+
+            class Footer extends React.Component{
+                render(){
+                    return(
+                        <div className = "bottom">
+                        <footer>
+                            Developed By : Nitesh Yadav
+                        </footer>
+                        </div>
+                    );
+                }    
+            }
+        
+            class RenderProduct extends React.Component{
+                render(){
+                    return(
+                        <div className = "product">
+                            <p>Product Name : {this.props.name} Price : {this.props.price} Brand : {this.props.brand}</p>
+                            <button onClick = {()=>{this.props.addProductToCarts(this.props.item.id)}} >Add to Cart</button>
+                        </div>
+                    );
+                }
+            }
+
+            class App extends React.Component{
+                render(){
+                    return(
+                        <div>
+                            <Header/>
+                            <Main/>
+                            <Footer/>
+                        </div>
+                    );
+                }
+            }
+
+            ReactDOM.render(<App/>, document.getElementById("main"))
+        </script>
+    </head>
+    <body>
+        <div id="main" class= "container"></div>
+    </body>
+</html>
