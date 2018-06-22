@@ -1,16 +1,23 @@
-import React, {Component} from 'react';
+import React from 'react';
 import '../styles/button.css';
-class OutputBox extends Component{
+import PropTypes from 'prop-types';
 
-    render(){
-        return(
-            <div>
-            <input className = "inputbox" type="text" value = {this.props.result}/>
-            <button className = "allClear" onClick = {this.props.clearOutput}>AC</button>
-            </div>
-        )
-    }
+const OutputBox = ({
+  result,
+  clearOutput,
+}) => (
+  <div>
+    <input className="inputbox" type="text" value={result} />
+    <button className="allClear" type="button" onClick={clearOutput}>
+    AC
+    </button>
+  </div>
+);
 
-}
+
+OutputBox.propTypes = {
+  result: PropTypes.string.isRequired,
+  clearOutput: PropTypes.func.isRequired,
+};
 
 export default OutputBox;
